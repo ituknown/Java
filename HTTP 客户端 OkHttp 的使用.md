@@ -154,7 +154,7 @@ GET 请求比较简单，只需要创建一个 Request 对象即可，实例：
 ```java
 Request request = new Request.Builder()
         .url("http://localhost:8080/user?id=1")
-        .addHeader("Accept", "application/json")
+        .addHeader("...", "...")
         .get()
         .build();
 
@@ -168,7 +168,7 @@ POST 请求相对于 GET 请求唯一多的一步就是构造请求体数据：
 ```java
 Request request = new Request.Builder()
 	.url("http://localhost:8080/")
-	.addHeader("Accept", "application/json")
+	.addHeader("...", "...")
 	.post(RequestBody) // 注意这里
 	.build();
 ```
@@ -187,7 +187,7 @@ public static RequestBody create(final MediaType contentType, final File file);
 其中 okhttp3.MediaType 对象是用于设置请求体类型，比如我想要请求的是 JSON 格式请求体就可以使用如下形式：
 
 ```java
-String plaintext = "...";
+String plaintext = "{...}";
 RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), plaintext);
 ```
 
@@ -196,7 +196,7 @@ RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;c
 ```java
 Request request = new Request.Builder()
                 .url("http://localhost:8080/")
-                .addHeader("Accept", "application/json")
+                .addHeader("...", "...")
                 .post(requestBody) // 注意这里
                 .build();
 ```
@@ -221,7 +221,7 @@ RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;c
 // 请求
 Request request = new Request.Builder()
     	.url("http://localhost:8080/")
-    	.addHeader("Accept", "application/json")
+    	.addHeader("...", "...")
     	.post(requestBody) // 请求体数据
     	.build();
 
@@ -241,7 +241,7 @@ FormBody requestBody = new FormBody.Builder()
 // 请求
 Request request = new Request.Builder()
         .url("http://localhost:8080/")
-        .addHeader("Accept", "application/json")
+        .addHeader("...", "...")
         .post(requestBody)
         .build();
 
