@@ -8,7 +8,7 @@
 </dependency>
 ```
 
-需要知道一点的是：okhttp 在 v4.0.0 之前使用的是 java 实现。但是自从 v4.0.0 开始，okhttp 使用 kotlin 语言进行了重写。
+需要知道一点的是：okhttp 自 4.0.0 开始，使用 kotlin 语言进行了重写。
 
 # 组件及请求流程
 
