@@ -284,8 +284,8 @@ Call call = CLIENT.newCall(request);
 
 ```java
 Request request = new Request.Builder()
-        .url("http://localhost:8080/head?id=1")
-        .addHeader("Accept", "application/json")
+        .url("http://localhost:8080/download/1")
+        .addHeader("...", "...")
         .get()
         .build();
 
