@@ -8,16 +8,16 @@
 </dependency>
 ```
 
-需要知道一点的是：okhttp 自 4.0.0 开始，使用 kotlin 语言进行了重写。
+需要知道一点的是：okhttp 自 4.0.0 开始，使用 kotlin 进行了重写。
 
 # 组件及请求流程
 
 | **组件** | **描述** |
 | :--- | :--- |
-| `OkHttpClient` | 一个线程安全的客户端实例（类似浏览器）。在实际在应用中应该全局唯一，通常创建为单例模式。 |
-| `Request` | 表示一次 HTTP 请求。可以设置请求方式、URL、Header及消息体。通常工厂 `new Request.Builder()...build()` 进行构建。 |
-| `Call` | 用于发送 HTTP 请求并处理响应。`Call` 接口定义了一个 `execute()` 方法和一个 `enqueue()` 方法，分别用于同步执行和异步执行 HTTP 请求。 |
-| `Response` | HTTP 响应结果。 |
+| `OkHttpClient` | 一个线程安全的客户端实例。在实际在应用中应该全局共用一个实例（单例模式） |
+| `Request` | 表示一次 HTTP 请求。可以设置请求方式、URL、Header及消息体。通常使用工厂 `new Request.Builder()...build()` 进行构建 |
+| `Call` | 用于发送 HTTP 请求并处理响应。`Call` 定义了一个 `execute()` 方法和一个 `enqueue()` 方法，分别用于同步执行和异步执行 HTTP 请求 |
+| `Response` | 请求响应结果 |
 
 基本的请求流程为：
 
@@ -28,25 +28,23 @@
 private static final OkHttpClient CLIENT = new OkHttpClient();
 ```
 
-推荐使用下面的方式：
+不过更推荐使用下面的方式创建：
 
 ```java
 private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder().build();
 ```
 
-因为在构造实例是我们通常会做些请求设置，比如超时时间、网络拦截器和DNS等。使用 Builder 模式更加方便，实例：
+因为在构造实例时我们通常需要做一些定制化配置（如超时时间、网络拦截器和DNS等），使用 Builder 模式更加方便。示例：
 
 ```java
 private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder()
-	.connectTimeout(3, TimeUnit.SECONDS) // 设置超时时间
+    .connectTimeout(3, TimeUnit.SECONDS) // 设置超时时间
     .addInterceptor(...) // 添加拦截器
     .dns(...)  // 设置DNS
     .build();
 ```
 
-当然，使用第一种也是可以的。但是你不觉得 Builder 模式阅读起来更爽 :) ？
-
-2、创建请求对象：设置URL、Header信息、请求体信息
+2、创建请求对象（设置URL、Header信息、请求参数信息）
 
 - GET 请求：
 
@@ -88,7 +86,7 @@ Request request = new Request.Builder()
 	.build();
 ```
 
-3、使用客户端对象执行请求
+3、执行请求
 
 ```java
 Call call = CLIENT.newCall(request);
@@ -96,10 +94,12 @@ Call call = CLIENT.newCall(request);
 
 4、获取到 Response 对象
 
+这一步才是真正的执行请求，okhttp 提供了同步和异步两种执行方式。
+
 同步请求：
 
 ```java
-try (Response execute = call.execute()) {  
+try (Response execute = call.execute()) {
     if (execute.isSuccessful()) { // 请求执行成功  
         // HTTP Code  
         int code = execute.code();  
@@ -145,18 +145,20 @@ call.enqueue(new Callback() {
 });
 ```
 
-5、释放资源
+也就是说，同步请求用 `call.execute()` 方法，异步请求用 `call.enqueue(new Callback()` 方法。
 
-# GET 请求
+5、最后释放资源
+
+# GET 请求示例
 
 GET 请求比较简单，只需要创建一个 Request 对象即可，实例：
 
 ```java
 Request request = new Request.Builder()
-        .url("http://localhost:8080/user?id=1")
-        .addHeader("...", "...")
-        .get()
-        .build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .get()
+    .build();
 
 Call call = CLIENT.newCall(request);
 ```
@@ -167,38 +169,41 @@ POST 请求相对于 GET 请求唯一多的一步就是构造请求体数据：
 
 ```java
 Request request = new Request.Builder()
-	.url("http://localhost:8080/")
-	.addHeader("...", "...")
-	.post(RequestBody) // 注意这里
-	.build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .post(RequestBody) // 注意这里
+    .build();
 ```
 
-okhttp3.RequestBody 类内部提供了多种静态方法，用于创建请求体数据的形式：
+okhttp3.RequestBody 类内部提供了多种静态方法，分别用于创建不同形式的请求体数据：
 
 ```java
-public static RequestBody create(final MediaType contentType, final byte[] content);
-public static RequestBody create(final MediaType contentType, final byte[] content, final int offset, final int byteCount);
-public static RequestBody create(final MediaType contentType, final ByteString content);
-public static RequestBody create(final MediaType contentType, final byte[] content);
-public static RequestBody create(final MediaType contentType, final byte[] content, final int offset, final int byteCount);
-public static RequestBody create(final MediaType contentType, final File file);
+public static RequestBody create(final byte[] content);
+public static RequestBody create(final byte[] content, final MediaType contentType);
+public static RequestBody create(final byte[] content, final MediaType contentType, final int offset);
+public static RequestBody create(final byte[] content, final MediaType contentType, final int offset, final int byteCount);
+
+public static RequestBody create(final String content, final MediaType contentType);
+
+public static RequestBody create(final ByteString content, final MediaType contentType);
+
+public static RequestBody create(final File file, final MediaType contentType);
 ```
 
 其中 okhttp3.MediaType 对象是用于设置请求体类型，比如我想要请求的是 JSON 格式请求体就可以使用如下形式：
 
 ```java
-String plaintext = "{...}";
-RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), plaintext);
+MediaType type = MediaType.parse("application/json;charset=utf-8");
 ```
 
 之后设置到 okhttp3.Request 对象即可：
 
 ```java
 Request request = new Request.Builder()
-                .url("http://localhost:8080/")
-                .addHeader("...", "...")
-                .post(requestBody) // 注意这里
-                .build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .post(requestBody) // 注意这里
+    .build();
 ```
 
 这些静态方法基本上满足我们日常使用了。不过，okhttp 还提供了两个 okhttp3.RequestBody 的扩展类，分别是用于文件上传的 `okhttp3.MultipartBody` 和 Form 表单数据 `okhttp3.FormBody`：
@@ -213,17 +218,18 @@ user.setUsername("HanMeimei");
 user.setAge(18);
 
 ObjectMapper objectMapper = new ObjectMapper();
-String plaintext = objectMapper.writeValueAsString(user);
+String content = objectMapper.writeValueAsString(user);
 
 // 创建 JSON 请求体数据
-RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"), plaintext);
+MediaType mediaType = MediaType.parse("application/json;charset=utf-8");
+RequestBody requestBody = RequestBody.create(content, mediaType);
 
 // 请求
 Request request = new Request.Builder()
-    	.url("http://localhost:8080/")
-    	.addHeader("...", "...")
-    	.post(requestBody) // 请求体数据
-    	.build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .post(requestBody) // 请求体数据
+    .build();
 
 Call call = CLIENT.newCall(request);
 ```
@@ -234,16 +240,16 @@ Form 表单请求使用的 Media 类型是 `application/x-www-form-urlencoded`�
 
 ```java
 FormBody requestBody = new FormBody.Builder()
-        .add("username", "HanMeimei")
-        .addEncoded("charset", "UTF-8")
-        .build();
+    .add("username", "HanMeimei")
+    .addEncoded("charset", "UTF-8")
+    .build();
 
 // 请求
 Request request = new Request.Builder()
-        .url("http://localhost:8080/")
-        .addHeader("...", "...")
-        .post(requestBody)
-        .build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .post(requestBody)
+    .build();
 
 Call call = CLIENT.newCall(request);
 ```
@@ -262,18 +268,22 @@ okhttp 同样提供了一个用于构造文件上传的请求体类：`Multipart
 
 ```java
 // 文件
-File file = new File("/path/RequestBody.png");
+File file = new File("/path/example.png");
 String fileName = file.getName();
 
+String mediaType = URLConnection.guessContentTypeFromName(fileName);
+if (mediaType == null) {
+    mediaType = "application/octet-stream"; // 默认二进制流
+}
+
 MultipartBody multipartBody = new MultipartBody.Builder()
-        // 后台接收的 key, 文件名称, 文件对象
-        .addFormDataPart("file", fileName, RequestBody.create(MediaType.parse("image/png"), file))
-        .build();
+    .addFormDataPart("file", fileName, RequestBody.create(file, MediaType.parse(mediaType)))
+    .build();
 
 Request request = new Request.Builder()
-        .url("http://localhost:8080/upload")
-        .post(multipartBody)
-        .build();
+    .url("https://domain:port/{path}")
+    .post(multipartBody)
+    .build();
 
 Call call = CLIENT.newCall(request);
 ```
@@ -284,10 +294,10 @@ Call call = CLIENT.newCall(request);
 
 ```java
 Request request = new Request.Builder()
-        .url("http://localhost:8080/download/1")
-        .addHeader("...", "...")
-        .get()
-        .build();
+    .url("https://domain:port/{path}")
+    .addHeader("...", "...")
+    .get()
+    .build();
 
 // 以同步请求为例
 Response response = CLIENT.newCall(request).execute();
