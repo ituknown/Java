@@ -1,7 +1,5 @@
 
 
-
-
 ```java
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
@@ -72,16 +70,12 @@ public class NullBeanSerializerModifier extends BeanSerializerModifier {
 
 
 
-
-
 ```java
 ObjectMapper objectMapper = new ObjectMapper();
 
 // 处理 Null 值
 objectMapper.setSerializerFactory(objectMapper.getSerializerFactory().withSerializerModifier(new NullBeanSerializerModifier()));
 ```
-
-
 
 
 
@@ -100,15 +94,11 @@ public class User {
 
 
 
-
-
 ```java
 User user = new User();
 
 System.out.println(objectMapper.writeValueAsString(user));
 ```
-
-
 
 
 
