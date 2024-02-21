@@ -1,6 +1,6 @@
 # Maven 依赖
 
-在 v4.0.0 之前的版本使用的是 Java 语言编写，在引入 pom 依赖时直接按照如下方式即可：
+引入 pom 文件依赖：
 
 ```xml
 <dependency>
