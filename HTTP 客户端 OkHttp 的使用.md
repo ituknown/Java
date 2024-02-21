@@ -1,7 +1,5 @@
 # Maven 依赖
 
-引入 pom 文件依赖：
-
 ```xml
 <dependency>
     <groupId>com.squareup.okhttp3</groupId>
