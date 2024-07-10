@@ -1,12 +1,14 @@
 TypeHandler 是 MyBatis 中一个重要的组件，它的作用是将数据库中的数据类型与 Java 中的数据类型进行转换。
 
-在开发过程中，当默认的 TypeHandler 无法满足需求时，就需要自己实现或扩展对应的 TypeHandler（例如遇到 MyBatis 不支持的数据类型或需要特殊处理的数据）。
+在开发过程中，当默认的 TypeHandler 无法满足需求或需要将自定义的类与数据库类型做映射时，就需要实现或扩展对应的 TypeHandler（比如敏感数据实现脱敏就）。
 
-在实际项目中我就遇到过在数据保存或者查询时需要脱敏的问题，就用到了自定义的 TypeHandler。
+当然，TypeHandler 的作用还不仅仅如此，还可以处理 Null 值问题。比如查询数据，当数据库字段的值为 NULL 时，就可以通过 TypeHandler 会将其转换为 Java 中合适的表示方式。
 
-当然，TypeHandler 的作用还不仅仅如此，还可以处理 Null 值问题。在数据查询或者结果映射过程中，当数据库字段的值为NULL时，TypeHandler 会将其转换为 Java 中合适的表示方式，例如 Java 中的 null 或者空字符串。
+自定义 TypeHandler 可以通过实现 org.apache.ibatis.type.TypeHandler 接口，不过官网文档建议直接继承 org.apache.ibatis.type.BaseTypeHandler。
 
-想要自定义扩展 TypeHandler 可以实现 MyBatis 提供的接口 org.apache.ibatis.type.TypeHandler。不过官网文档建议使用 org.apache.ibatis.type.BaseTypeHandler。
+MyBatis 已经内置了很多 TypeHandler，这些 TypeHandler 已经可以满足我们日常的开发需求。
+
+比如处理 java.util.Date 的 org.apache.ibatis.type.DateTypeHandler。
 
 下面是一个执行身份证号码保存和查询时脱敏的示例：
 
