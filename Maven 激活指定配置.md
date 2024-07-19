@@ -12,7 +12,7 @@ settings-outsourcing.xml settings-office.xml
 之后当你需要打包上传时只需要指定不同的 settings 即可：
 
 ```bash
-mvn deploy -s /HomePath/.m2/settings.xml
+mvn -s /HomePath/.m2/settings.xml [deploy]
 ```
 
 # 激活指定 profile
@@ -60,10 +60,10 @@ mvn deploy -s /HomePath/.m2/settings.xml
 
 ```bash
 # 开发环境
-mvnd -P dev
+mvnd [deploy] -P dev
 
 # 产线环境
-mvnd -P prod
+mvnd [deploy] -P prod
 ```
 
 `-P` 不仅仅作用 pom.xml，还同时作用在 settings.xml 文件中。当执行 `mvnd -P dev` 命令时，不仅仅会查找 pom.xml 中的 dev 配置，还会查找 settings.xml 的同名配置。作用 settings.xml 文件时，等价于 `<activeProfiles>` 元素。
@@ -78,7 +78,7 @@ mvnd -P prod
             <!-- 配置内容 -->
         </profile>
         <profile>
-            <id>prod</id>
+            <id>other_profile</id>
             <!-- 配置内容 -->
         </profile>
     </profiles>
@@ -90,26 +90,26 @@ mvnd -P prod
 
 默认使用的是 dev 配置，当需要发布时可以使用 `-P` 参数指定指定 prod 配置。当然了，可以同时激活多个配置（示例如下）。
 
-- 同时激活 dev 和 prod：
+- 同时激活 dev 和 other_profile：
 
 ```bash
-mvn -P dev,prod
+mvn [deploy] -P dev,other_profile
 ```
 
-该命令会同时使用 pom.xml 中的 dev、prod 配置及 settings.xml 中的 dev 和 prod 配置。
+该命令会使用 pom.xml 中的 dev 配置的同时还会激活 settings.xml 的 dev 和 other_profile 配置。
 
-- 禁用 dev，启用 prod：
+- 禁用 dev、prod，只激活 other_profile：
 
 ```bash
-mvn -P !dev,prod
+mvn [deploy] -P !dev,!prod,other_profile
 ```
 
-该命令会禁用 dev 配置，并仅仅使用 prod 配置。
+该命令会同时禁用 pom.xml 中的 dev 和 prod 配置，也会禁用 settings.xml 中的 dev 并仅仅启用 other_profile。
 
 是不是很灵活？当然了还可以配合 `-s` 一起使用：
 
 ```bash
-mvn -s /path/settings.xml -P profile_id <command>
+mvn -s /path/settings.xml [deploy] -P profile_id
 ```
 
 
