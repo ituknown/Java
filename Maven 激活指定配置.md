@@ -38,6 +38,7 @@ mvn -s /HomePath/.m2/settings.xml [deploy]
                 </dependency>
             </dependencies>
         </profile>
+
         <profile>
             <id>prod</id>
             <properties>
