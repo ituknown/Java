@@ -61,10 +61,10 @@ mvn -s /HomePath/.m2/settings.xml [deploy]
 
 ```bash
 # 开发环境
-mvnd [deploy] -P dev
+$ mvn [deploy] -P dev
 
 # 产线环境
-mvnd [deploy] -P prod
+$ mvn [deploy] -P prod
 ```
 
 `-P` 不仅仅作用 pom.xml，还同时作用于 settings.xml。当执行 `mvnd -P dev` 命令时，在 pom.xml 中的查找 profile id 为 dev 的同时，还会查找 settings.xml 中同名配置（等价于 `<activeProfiles>dev</activeProfiles>` 元素）。。
