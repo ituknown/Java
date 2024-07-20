@@ -66,7 +66,7 @@ mvnd [deploy] -P dev
 mvnd [deploy] -P prod
 ```
 
-`-P` 不仅仅作用 pom.xml，还同时作用在 settings.xml 文件中。当执行 `mvnd -P dev` 命令时，不仅仅会查找 pom.xml 中的 dev 配置，还会查找 settings.xml 的同名配置。作用 settings.xml 文件时，等价于 `<activeProfiles>` 元素。
+`-P` 不仅仅作用 pom.xml，还同时作用于 settings.xml。当执行 `mvnd -P dev` 命令时，在 pom.xml 中的查找 profile id 为 dev 的同时，还会查找 settings.xml 中同名配置（等价于 `<activeProfiles>dev</activeProfiles>` 元素）。。
 
 下面是 settings.xml 示例：
 
@@ -77,18 +77,20 @@ mvnd [deploy] -P prod
             <id>dev</id>
             <!-- 配置内容 -->
         </profile>
+
         <profile>
             <id>other_profile</id>
             <!-- 配置内容 -->
         </profile>
     </profiles>
+
     <activeProfiles>
         <activeProfile>dev</activeProfile>
     </activeProfiles>
 </settings>
 ```
 
-默认使用的是 dev 配置，当需要发布时可以使用 `-P` 参数指定指定 prod 配置。当然了，可以同时激活多个配置（示例如下）。
+默认使用的是 dev 配置，当需要发布时可以使用 `-P` 参数指定指定 other_profile 配置。当然了，可以同时激活多个配置（示例如下）。
 
 - 同时激活 dev 和 other_profile：
 
@@ -96,7 +98,7 @@ mvnd [deploy] -P prod
 mvn [deploy] -P dev,other_profile
 ```
 
-该命令会使用 pom.xml 中的 dev 配置的同时还会激活 settings.xml 的 dev 和 other_profile 配置。
+该命令会使用 pom.xml 中的 dev 配置的同时还会激活 settings.xml 中 dev 和 other_profile 配置。
 
 - 禁用 dev、prod，只激活 other_profile：
 
@@ -109,7 +111,7 @@ mvn [deploy] -P !dev,!prod,other_profile
 是不是很灵活？当然了还可以配合 `-s` 一起使用：
 
 ```bash
-mvn -s /path/settings.xml [deploy] -P profile_id
+mvn -s /path/settings.xml [deploy] -P [profile_id...]
 ```
 
 
