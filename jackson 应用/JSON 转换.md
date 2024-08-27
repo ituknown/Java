@@ -366,38 +366,92 @@ User user = objectMapper.readValue(jsonStr, new TypeReference<User>(){});
 System.out.println(user);
 ```
 
+不过实际使用时并不推荐使用 `TypeReference`，因为 Java 的泛型类型擦除机制使得在运行时无法获取具体的类型信息。
+
 ## 字符串转 List
 
-在实际使用中我们比较多的应用就是 JSON 数组形式的字符串转集合，想要解决这个问题就不能使用 `Class` 重载方法了，而要使用 `TypeReference` 重载方法。看下示例：
+在实际使用中我们比较多的应用就是 JSON 数组形式的字符串转集合，想要解决这个问题就不能使用 `Class` 重载方法了，取而代之的是使用 TypeFactory：
 
 ```java
 String jsonStr = "[{\"name\":\"张三\",\"age\":18,\"date\":null,\"time\":null,\"dateTime\":null,\"tags\":null},{\"name\":\"李四\",\"age\":20,\"date\":null,\"time\":null,\"dateTime\":null,\"tags\":null}]";
 
-ObjectMapper objectMapper = new ObjectMapper();
+CollectionType collectionType = objectMapper.getTypeFactory().constructCollectionType(List.class, User.class);
 
+List<User> userList = objectMapper.readValue(json, collectionType);
+```
+
+不过也可以使用 `TypeReference` 实现（虽然不推荐）。看下示例：
+
+```java
 // 注意 TypeReference 的用法
 List<User> user = objectMapper.readValue(jsonStr, new TypeReference<List<User>>(){});
-System.out.println(user);
+```
+
+封装一个转任意集合的方法：
+
+```java
+public static <T, C extends Collection<T>> C toCollection(String json, Class<C> collectionType, Class<T> elementType) {
+    try {
+        CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(collectionType, elementType);
+        return objectMapper.readValue(json, javaType);
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to parse json to collection. json: " + json + ", collectionType: " + collectionType + ", elementType: " + elementType, e);
+    }
+}
+```
+
+使用示例：
+
+```java
+@SuppressWarnings("unchecked")  
+List<User> userList = toCollection(jsonList, List.class, User.class);
 ```
 
 ## 字符串转 Map
 
-同样了，字符串转 Map 也不能少，转 Map 我们同样需要使用 `TypeReference` API。
-
-记住一点，`Class` API 能解决的 `TypeReference` 都能解决，`Class` 解决不了的，`TypeReference` 还能解决~
-
-直接看示例：
+同样了，字符串转 Map 也不能少：
 
 ```java
 String jsonStr = "[{\"name\":\"张三\",\"age\":18,\"date\":null,\"time\":null,\"dateTime\":null,\"tags\":null},{\"name\":\"李四\",\"age\":20,\"date\":null,\"time\":null,\"dateTime\":null,\"tags\":null}]";
 
-ObjectMapper objectMapper = new ObjectMapper();
+MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
 
-// 注意 TypeReference 的用法
-Map<String, String> map = objectMapper.readValue(jsonStr, new TypeReference<Map<String, String>>() {});
-System.out.println(user);
+Map<String, String> map = objectMapper.readValue(jsonStr, mapType);
 ```
 
+我们同样需要使用 `TypeReference` API：
+
+```java
+// 注意 TypeReference 的用法
+Map<String, String> map = objectMapper.readValue(jsonStr, new TypeReference<Map<String, String>>() {});
+```
+
+可以进一步的封装成工具类使用：
+
+```java
+ public static <K, V> Map<K, V> toMap(String json, Class<K> keyType, Class<V> valueType) {
+    try {
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, keyType, valueType);
+        return objectMapper.readValue(json, mapType);
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to parse json to map. json:" + json + " keyType:" + keyType + " valueType:" + valueType, e);
+    }
+}
+```
+
+继续封装一个 `List<Map>` 方法：
+
+```java
+public static <K, V> List<Map<K, V>> toListMap(String json, Class<K> keyType, Class<V> valueType) {
+    try {
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, keyType, valueType);
+        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, mapType);
+        return objectMapper.readValue(json, listType);
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to parse json to list of maps. json:" + json + " keyType:" + keyType + " valueType:" + valueType, e);
+    }
+}
+```
 
 ## Java8 日期反序列化问题
 
