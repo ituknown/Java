@@ -115,4 +115,12 @@ mvn [deploy] -P !dev,!prod,other_profile
 mvn -s /path/settings.xml [deploy] -P [profile_id...]
 ```
 
+# mvnd 最佳实战
 
+尤其是配合新一代 mvd 使用，可以直接替代原 maven 使用，示例如下，简直不要太爽~
+
+```bash
+alias mvn-clean-aliyun='mvnd -s ~/.m2/settings.xml clean -P "aliyun,!office"'
+alias mvn-deploy-aliyun='mvnd -s ~/.m2/settings.xml deploy -P "aliyun,!office"'
+alias mvn-compile-aliyun='mvnd -s ~/.m2/settings.xml compile -P "aliyun,!office"'
+```
