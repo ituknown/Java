@@ -338,7 +338,7 @@ ObjectMapper 类中除了定义 String 的重载 API 还定义了多种流的重
 
 `TypeReference` 相比较 `Class` 更加强大，因为 `Class` 只能接受单类型对象，如果想要将 Json 字符串转换为集合或者 Map 对象 `Class` 是实现不了的，这种情况下只能使用 `TypeReference`。下面还是具体说明：
 
-## 字符串转 Class
+## 字符串转对象
 
 话不多说，直接上代码：
 
@@ -368,7 +368,7 @@ System.out.println(user);
 
 不过实际使用时并不推荐使用 `TypeReference`，因为 Java 的泛型类型擦除机制使得在运行时无法获取具体的类型信息。
 
-## 字符串转 List
+## 字符串转集合
 
 在实际使用中我们比较多的应用就是 JSON 数组形式的字符串转集合，想要解决这个问题就不能使用 `Class` 重载方法了，取而代之的是使用 TypeFactory：
 
@@ -390,12 +390,17 @@ List<User> user = objectMapper.readValue(jsonStr, new TypeReference<List<User>>(
 封装一个转任意集合的方法：
 
 ```java
-public static <T, C extends Collection<T>> C toCollection(String json, Class<C> collectionType, Class<T> elementType) {
+@SuppressWarnings("unchecked")
+public static <E> ArrayList<E> toCollection(String json, Class<E> element) {
+    return toCollection(json, ArrayList.class, element);
+}
+
+public static <C extends Collection<E>, E> C toCollection(String json, Class<C> collection, Class<E> element) {
     try {
-        CollectionType javaType = objectMapper.getTypeFactory().constructCollectionType(collectionType, elementType);
-        return objectMapper.readValue(json, javaType);
+        CollectionType type = MAPPER.getTypeFactory().constructCollectionType(collection, element);
+        return MAPPER.readValue(json, type);
     } catch (Exception e) {
-        throw new RuntimeException("Failed to parse json to collection. json: " + json + ", collectionType: " + collectionType + ", elementType: " + elementType, e);
+        throw new RuntimeException("Parse json to Collection<E> failed:" + json, e);
     }
 }
 ```
@@ -404,10 +409,10 @@ public static <T, C extends Collection<T>> C toCollection(String json, Class<C> 
 
 ```java
 @SuppressWarnings("unchecked")  
-List<User> userList = toCollection(jsonList, List.class, User.class);
+List<User> userList = toCollection(json, ArrayList.class, User.class);
 ```
 
-## 字符串转 Map
+## 字符串转Map
 
 同样了，字符串转 Map 也不能少：
 
@@ -429,26 +434,36 @@ Map<String, String> map = objectMapper.readValue(jsonStr, new TypeReference<Map<
 可以进一步的封装成工具类使用：
 
 ```java
- public static <K, V> Map<K, V> toMap(String json, Class<K> keyType, Class<V> valueType) {
+@SuppressWarnings("unchecked")
+public static <K, V> HashMap<K, V> toMap(String json, Class<K> key, Class<V> value) {
+    return toMap(json, HashMap.class, key, value);
+}
+
+public static <K, V, H extends Map<K, V>> H toMap(String json, Class<H> map, Class<K> key, Class<V> value) {
     try {
-        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, keyType, valueType);
-        return objectMapper.readValue(json, mapType);
+        MapType type = MAPPER.getTypeFactory().constructMapType(map, key, value);
+        return MAPPER.readValue(json, type);
     } catch (Exception e) {
-        throw new RuntimeException("Failed to parse json to map. json:" + json + " keyType:" + keyType + " valueType:" + valueType, e);
+        throw new RuntimeException("Parse json to Map<K, V> failed:" + json, e);
     }
 }
 ```
 
-继续封装一个 `List<Map>` 方法：
+继续封装一个 `Collection<Map>` 方法：
 
 ```java
-public static <K, V> List<Map<K, V>> toListMap(String json, Class<K> keyType, Class<V> valueType) {
+@SuppressWarnings("unchecked")
+public static <K, V> ArrayList<HashMap<K, V>> toCollectionMap(String json, Class<K> key, Class<V> value) {
+    return toCollectionMap(json, ArrayList.class, HashMap.class, key, value);
+}
+
+public static <K, V, H extends Map<K, V>, C extends Collection<H>> C toCollectionMap(String json, Class<C> collection, Class<H> map, Class<K> key, Class<V> value) {
     try {
-        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, keyType, valueType);
-        CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, mapType);
-        return objectMapper.readValue(json, listType);
+        MapType mapType = MAPPER.getTypeFactory().constructMapType(map, key, value);
+        CollectionType collectionType = MAPPER.getTypeFactory().constructCollectionType(collection, mapType);
+        return MAPPER.readValue(json, collectionType);
     } catch (Exception e) {
-        throw new RuntimeException("Failed to parse json to list of maps. json:" + json + " keyType:" + keyType + " valueType:" + valueType, e);
+        throw new RuntimeException("Parse json to Collection<Map<K, V>>> failed:" + json, e);
     }
 }
 ```
