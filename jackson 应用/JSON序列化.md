@@ -11,21 +11,15 @@ public String writeValueAsString(Object value);
 现在来看下如何将对象转换为 JSON 字符串，声明一个 User 类：
 
 ```java
+@Getter
+@Setter
 public class User {
-
     private String name;
-
     private Integer age;
-
     private LocalDate date;
-
     private LocalTime time;
-
     private LocalDateTime dateTime;
-
     private List<String> tags;
-
-    // Getter And Setter, 下文略...
 }
 ```
 
@@ -135,6 +129,41 @@ System.out.println(json);
 | :--- |
 | 如果不显示的调用  `ObjectMapper#setSerializationInclusion()` 方法进行设置 `JsonInclude.Include` ，那么它的默认值是 `ALWAYS`，即默认会序列化类中的所有属性字段（不包括 `static`）。 |
 
+# 输出全部字段
+
+想要输出全部字段（包括值为 null 值字段）有两种实现方式：局部配置以及全局配置。局部配置和全局配置各有优缺点，不过如果同时配置的话局部配置的优先级更高。
+
+局部配置可以使用 `@JsonInclude` 注解，这个注解可以应用于类级别或字段级别。下面是一个示例：
+
+```java
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.ALWAYS) // 序列化时始终包括 null 值的字段
+public class MyObject {
+    private String field1;
+    private Integer field2;
+    // ...
+}
+```
+
+全局配置则显得简单直接，不过在某些时候将 null 字段也输出出来总显得有些多余。如何取舍看具体应用场景吧：
+
+```java
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+ObjectMapper objectMapper = new ObjectMapper();
+
+// 2.9 之前可以使用该配置实现输出全部字段
+objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true);
+
+// 2.9 及之后推荐使用下面两种配置方式实现输出全部字段
+objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+// 或
+objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.ALWAYS);
+```
+
 # 忽略指定字段
 
 ## 使用 JsonIgnoreProperties
@@ -216,6 +245,26 @@ public class User {
 
 但，怎么说了...... 这个 API 用起来很难受反正。
 
+# 字段排序
+
+Jackson序列化默认按照字段声明顺序输出，也可以按照字典顺序输出。
+
+**全局配置：**
+
+```java
+objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+```
+
+**类级别顺序：**
+
+```java
+@JsonPropertyOrder(alphabetic = true)
+public class User {
+    private int id;
+    private String name;
+    private int age;
+}
+```
 # 输出到本地文件
 
 Jackson 不仅仅能够将一个对象序列化成一个 Json 字符串，还能够将序列化的结果输出到本地文件、IO流以及二进制数据等等。
@@ -240,41 +289,6 @@ File file = new File("/Users/xx/Desktop/test.txt");
 User user = User.builder().name("张三").age(18).date(LocalDate.now()).build();
 
 objectMapper.writeValue(file, user);
-```
-
-# 输出全部字段
-
-想要输出全部字段（包括值为 null 值字段）有两种实现方式：局部配置以及全局配置。局部配置和全局配置各有优缺点，不过如果同时配置的话局部配置的优先级更高。
-
-局部配置可以使用 `@JsonInclude` 注解，这个注解可以应用于类级别或字段级别。下面是一个示例：
-
-```java
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@JsonInclude(JsonInclude.Include.ALWAYS) // 序列化时始终包括 null 值的字段
-public class MyObject {
-    private String field1;
-    private Integer field2;
-    // ...
-}
-```
-
-全局配置则显得简单直接，不过在某些时候将 null 字段也输出出来总显得有些多余。如何取舍看具体应用场景吧：
-
-```java
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-ObjectMapper objectMapper = new ObjectMapper();
-
-// 2.9 之前可以使用该配置实现输出全部字段
-objectMapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, true);
-
-// 2.9 及之后推荐使用下面两种配置方式实现输出全部字段
-objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
-// 或
-objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.ALWAYS);
 ```
 
 # 格式化输出

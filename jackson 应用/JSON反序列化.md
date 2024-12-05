@@ -195,6 +195,13 @@ public <T> T readValue(InputStream src, TypeReference valueTypeRef);
 ObjectMapper objectMapper = new ObjectMapper();
 User user = objectMapper.readValue(new FileInputStream(new File("/Users/Desktop/test.txt")), User.class);
 ```
+
+# 忽略未知字段错误
+
+```java
+OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+```
+
 # Java8 日期反序列化问题
 
 Jackson在反序列化处理Java8日期存在一些问题：
