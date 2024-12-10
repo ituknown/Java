@@ -1,5 +1,6 @@
 ```java
 import javax.crypto.Cipher;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -16,13 +17,13 @@ public class RsaUtil {
     /**
      * 公钥加密
      *
-     * @param plainText 带加密文本
+     * @param plaintext 明文
      * @param pubKey    公钥
      */
-    public static <R> R encrypt(String plainText, PublicKey pubKey, Production<R> production) throws Exception {
+    public static <R> R encrypt(String plaintext, PublicKey pubKey, Production<R> production) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
-        byte[] encrypted = cipher.doFinal(plainText.getBytes()); // 密文
+        byte[] encrypted = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8)); // 密文
         return production.apply(encrypted);
     }
 
@@ -31,12 +32,12 @@ public class RsaUtil {
      *
      * @param pubKeyBase64 base64格式公钥
      */
-    public static <R> R encrypt(String plainText, String pubKeyBase64, Production<R> production) throws Exception {
+    public static <R> R encrypt(String plaintext, String pubKeyBase64, Production<R> production) throws Exception {
         // 公钥证书
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodeBase64ToByte(pubKeyBase64));
         PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpec);
 
-        return encrypt(plainText, publicKey, production); // 加密
+        return encrypt(plaintext, publicKey, production); // 加密
     }
 
     /**
@@ -44,29 +45,29 @@ public class RsaUtil {
      *
      * @param pubKeyBase64 base64格式公钥
      */
-    public static String encryptToBase64String(String plainText, String pubKeyBase64) throws Exception {
+    public static String encryptToBase64String(String plaintext, String pubKeyBase64) throws Exception {
         // 公钥证书
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(decodeBase64ToByte(pubKeyBase64));
         PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(keySpec);
 
-        return encrypt(plainText, publicKey, RsaUtil::toBase64String); // 加密
+        return encrypt(plaintext, publicKey, RsaUtil::toBase64String); // 加密
     }
 
     /**
      * 私钥解密
      *
-     * @param encryptedText 密文
-     * @param priKey        私钥
+     * @param encrypted 密文
+     * @param priKey    私钥
      */
-    public static <R> R decrypt(String encryptedText, PrivateKey priKey, Production<R> production) throws Exception {
+    public static <R> R decrypt(String encrypted, PrivateKey priKey, Production<R> production) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, priKey);
-        byte[] decrypted = cipher.doFinal(decodeBase64ToByte(encryptedText));
+        byte[] decrypted = cipher.doFinal(decodeBase64ToByte(encrypted));
         return production.apply(decrypted);
     }
 
-    public static String decryptToString(String encryptedText, PrivateKey priKey) throws Exception {
-        return decrypt(encryptedText, priKey, String::new);
+    public static String decryptToString(String encrypted, PrivateKey priKey) throws Exception {
+        return decrypt(encrypted, priKey, String::new);
     }
 
     /**
