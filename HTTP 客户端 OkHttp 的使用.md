@@ -100,48 +100,48 @@ Call call = CLIENT.newCall(request);
 
 ```java
 try (Response execute = call.execute()) {
-    if (execute.isSuccessful()) { // 请求执行成功  
-        // HTTP Code  
-        int code = execute.code();  
-  
-        // 响应体  
-        ResponseBody response = execute.body();  
-        if (response != null) {  
-            // 消息长度  
-            long length = response.contentLength();  
-  
-            // 消息媒体类型  
-            MediaType mediaType = response.contentType();  
-  
-            // 可以使用下面任意一种方式获取消息体  
-  
-            String string = response.string(); // 字符串  
-            byte[] bytes = response.bytes(); // 字节数组  
-            InputStream in = response.byteStream(); // 字节流  
-            Reader reader = response.charStream(); // 字符流  
-        }  
-    }  
-} catch (Exception e) {  
-    // handler exception  
+    if (execute.isSuccessful()) { // 请求执行成功
+        // HTTP Code
+        int code = execute.code();
+
+        // 响应体
+        ResponseBody response = execute.body();
+        if (response != null) {
+            // 消息长度
+            long length = response.contentLength();
+
+            // 消息媒体类型
+            MediaType mediaType = response.contentType();
+
+            // 可以使用下面任意一种方式获取消息体
+
+            String string = response.string(); // 字符串
+            byte[] bytes = response.bytes(); // 字节数组
+            InputStream in = response.byteStream(); // 字节流
+            Reader reader = response.charStream(); // 字符流
+        }
+    }
+} catch (Exception e) {
+    // handler exception
 }
 ```
 
 异步请求：
 
 ```java
-call.enqueue(new Callback() {  
-    @Override  
-    public void onFailure(@NotNull Call call, @NotNull IOException e) {  
-        LOGGER.error("request fail: {}, exception: {}", call.request(), e.getMessage(), e);  
-    }  
-  
-    @Override  
-    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {  
-        if (response.isSuccessful()) {  
-            // 与同步请求一样，继续处理 response        } else {  
-            // 请求失败处理  
-        }  
-    }  
+call.enqueue(new Callback() {
+    @Override
+    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+        LOGGER.error("request fail: {}, exception: {}", call.request(), e.getMessage(), e);
+    }
+
+    @Override
+    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+        if (response.isSuccessful()) {
+            // 与同步请求一样，继续处理 response        } else {
+            // 请求失败处理
+        }
+    }
 });
 ```
 
@@ -208,7 +208,7 @@ Request request = new Request.Builder()
 
 这些静态方法基本上满足我们日常使用了。不过，okhttp 还提供了两个 okhttp3.RequestBody 的扩展类，分别是用于文件上传的 `okhttp3.MultipartBody` 和 Form 表单数据 `okhttp3.FormBody`：
 
-![RequestBody.png](http://java-media.knowledge.ituknown.cn/okhttp/RequestBody.png)
+![RequestBody.png](https://ituknown.cn/java-media/okhttp/RequestBody.png)
 
 ## JSON 请求
 

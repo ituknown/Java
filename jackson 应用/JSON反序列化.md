@@ -76,7 +76,7 @@ public static <E, C extends Collection<E>> C toCollection(String json, Class<C> 
 使用示例：
 
 ```java
-@SuppressWarnings("unchecked")  
+@SuppressWarnings("unchecked")
 List<User> userList = toCollection(json, ArrayList.class, User.class);
 ```
 
@@ -219,6 +219,6 @@ Jackson在反序列化处理Java8日期存在一些问题：
 
 当你尝试转换成 User 对象时会提示如下错误：
 
-![deserializationJava8DateFail1708509575.png](http://java-media.knowledge.ituknown.cn/jackson/deserializationJava8DateFail1708509575.png)
+![deserializationJava8DateFail1708509575.png](https://ituknown.cn/java-media/jackson/deserializationJava8DateFail1708509575.png)
 
 归根结底，这是 Jackson 对 Java8 日期格式化得问题，解决方式见 [Java8日期格式问题](../java8日期格式问题.md)。
