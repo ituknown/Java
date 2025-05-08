@@ -208,7 +208,7 @@ Request request = new Request.Builder()
 
 这些静态方法基本上满足我们日常使用了。不过，okhttp 还提供了两个 okhttp3.RequestBody 的扩展类，分别是用于文件上传的 `okhttp3.MultipartBody` 和 Form 表单数据 `okhttp3.FormBody`：
 
-![RequestBody.png](https://ituknown.cn/java-media/okhttp/RequestBody.png)
+![RequestBody.png](https://ituknown.org/java-media/okhttp/RequestBody.png)
 
 ## JSON 请求
 
