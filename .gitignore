@@ -1,5 +1,7 @@
-.DS_Store
-/**/.DS_Store
+### Obsidian config
+.obsidian/workspace.json
+.obsidian/themes
+.obsidian/plugins
 
-.idea
-.obsidian/
+### MacOS
+.DS_Store
