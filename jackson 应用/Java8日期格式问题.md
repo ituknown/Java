@@ -58,7 +58,7 @@ String json = objectMapper.writeValueAsString(user);
 }
 ```
 
-注意看 `date`、`time` 和 `dateTime` 字段，这个输出信息与我们预想的似乎不太一样。
+注意看 `date` 、 `time` 和 `dateTime` 字段，这个输出信息与我们预想的似乎不太一样。
 
 解决该问题主要有两种方式：使用 Jackson 的 JavaTimeModule 或者 使用自定义序列化反序列化方式。分别来看下：
 
@@ -86,7 +86,7 @@ JavaTimeModule javaTimeModule = new JavaTimeModule();
 public ObjectMapper registerModule(Module module);
 ```
 
-所以，为了方便我们还是创建一个静态方法来配置 `JavaTimeModule`，如下：
+所以，为了方便我们还是创建一个静态方法来配置 `JavaTimeModule` ，如下：
 
 ```java
 private static void configureObjectMapper4Jsr310(ObjectMapper objectMapper) {
@@ -108,7 +108,7 @@ private static void configureObjectMapper4Jsr310(ObjectMapper objectMapper) {
 
 先看下 JavaTimeModule 类继承图：
 
-![JavaTimeModule.png](https://ituknown.org/java-media/jackson/JavaTimeModule1708509985.png)
+![JavaTimeModule.png](https://media.ituknown.org/java-media/jackson/JavaTimeModule1708509985.png)
 
 配置日期格式问题我们主要借助它的两个方法：
 
@@ -122,9 +122,9 @@ public <T> SimpleModule addDeserializer(Class<T> type, JsonDeserializer<? extend
 
 这两个方法都是在父类中的 SimpleModule 中定义。
 
-形参 `type` 指的是我们要序列化的类型，如 `LocalDateTime.class`。
+形参 `type` 指的是我们要序列化的类型，如 `LocalDateTime.class` 。
 
-形参 `ser` 和 `deser` 指的是我们序列化和反序列化的具体实现方式，比如我们要配置 `LocalDateTime.class` 的序列化和反序列化方法，需要传递的序列化和反序列化对象就是 `LocalDateTimeSerializer` 和 `LocalDateTimeDeserializer`。
+形参 `ser` 和 `deser` 指的是我们序列化和反序列化的具体实现方式，比如我们要配置 `LocalDateTime.class` 的序列化和反序列化方法，需要传递的序列化和反序列化对象就是 `LocalDateTimeSerializer` 和 `LocalDateTimeDeserializer` 。
 
 具体就不做过多说明了，现在来看下该具体配置吧，直接上代码：
 
@@ -201,7 +201,7 @@ System.out.println(user);
 
 看下截图：
 
-![HandlerJava8DateTime1708510099.png](https://ituknown.org/java-media/jackson/HandlerJava8DateTime1708510099.png)
+![HandlerJava8DateTime1708510099.png](https://media.ituknown.org/java-media/jackson/HandlerJava8DateTime1708510099.png)
 
 这就完结解决 Java8 日期格式的问题了~
 
@@ -214,6 +214,7 @@ System.out.println(user);
 ## 日期序列化配置
 
 序列化 LocalDate：
+
 ```java
 public class LocalDateJsonSerializer extends JsonSerializer<LocalDate> {
 
@@ -225,6 +226,7 @@ public class LocalDateJsonSerializer extends JsonSerializer<LocalDate> {
 ```
 
 序列化 LocalTime：
+
 ```java
 public class LocalTimeJsonSerializer extends JsonSerializer<LocalTime> {
     @Override
@@ -235,6 +237,7 @@ public class LocalTimeJsonSerializer extends JsonSerializer<LocalTime> {
 ```
 
 序列化 LocalDateTime：
+
 ```java
 public class LocalTimeJsonSerializer extends JsonSerializer<LocalDateTime> {
     @Override
@@ -247,6 +250,7 @@ public class LocalTimeJsonSerializer extends JsonSerializer<LocalDateTime> {
 ## 日期反序列化配置
 
 反序列化LocalDate：
+
 ```java
 public class LocalDateJsonDeserializer extends JsonDeserializer<LocalDate> {
     @Override
@@ -257,6 +261,7 @@ public class LocalDateJsonDeserializer extends JsonDeserializer<LocalDate> {
 ```
 
 反序列化LocalTime：
+
 ```java
 public class LocalTimeJsonDeserializer extends JsonDeserializer<LocalTime> {
 
@@ -268,6 +273,7 @@ public class LocalTimeJsonDeserializer extends JsonDeserializer<LocalTime> {
 ```
 
 反序列化LocalDateTime：
+
 ```java
 public class LocalDateTimeJsonDeserializer extends JsonDeserializer<LocalDateTime> {
     @Override
@@ -351,9 +357,9 @@ public class User {
 }
 ```
 
-抱歉，不行的。`@JsonFormat` 配置形式只能格式化 `java.util.Date` 日期格式~
+抱歉，不行的。 `@JsonFormat` 配置形式只能格式化 `java.util.Date` 日期格式~
 
-实际上，还有一种使用形式。不过这种主要是在 SpringMVC 的消息转换器中使用。因为需要借助 SpringMVC 的 Jackson 消息转换器 `org.springframework.http.converter.json.Jackson2ObjectMapperBuilder`。如下示例：
+实际上，还有一种使用形式。不过这种主要是在 SpringMVC 的消息转换器中使用。因为需要借助 SpringMVC 的 Jackson 消息转换器 `org.springframework.http.converter.json.Jackson2ObjectMapperBuilder` 。如下示例：
 
 ```java
 private static void configureObjectMapper4Jsr310(ObjectMapper objectMapper) {

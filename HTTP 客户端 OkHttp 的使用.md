@@ -16,7 +16,7 @@
 | :--- | :--- |
 | `OkHttpClient` | 一个线程安全的客户端实例。在实际在应用中应该全局共用一个实例（单例模式） |
 | `Request` | 表示一次 HTTP 请求。可以设置请求方式、URL、Header及消息体。通常使用工厂 `new Request.Builder()...build()` 进行构建 |
-| `Call` | 用于发送 HTTP 请求并处理响应。`Call` 定义了一个 `execute()` 方法和一个 `enqueue()` 方法，分别用于同步执行和异步执行 HTTP 请求 |
+| `Call` | 用于发送 HTTP 请求并处理响应。 `Call` 定义了一个 `execute()` 方法和一个 `enqueue()` 方法，分别用于同步执行和异步执行 HTTP 请求 |
 | `Response` | 请求响应结果 |
 
 基本的请求流程为：
@@ -46,7 +46,7 @@ private static final OkHttpClient CLIENT = new OkHttpClient().newBuilder()
 
 2、创建请求对象（设置URL、Header信息、请求参数信息）
 
-- GET 请求：
+* GET 请求：
 
 ```java
 Request request = new Request.Builder()
@@ -56,7 +56,7 @@ Request request = new Request.Builder()
 	.build();
 ```
 
-- POST 请求：
+* POST 请求：
 
 ```java
 Request request = new Request.Builder()
@@ -66,7 +66,7 @@ Request request = new Request.Builder()
 	.build();
 ```
 
-- DELETE 请求：
+* DELETE 请求：
 
 ```java
 Request request = new Request.Builder()
@@ -76,7 +76,7 @@ Request request = new Request.Builder()
 	.build();
 ```
 
-- PUT 请求：
+* PUT 请求：
 
 ```java
 Request request = new Request.Builder()
@@ -175,7 +175,7 @@ Request request = new Request.Builder()
     .build();
 ```
 
-okhttp3.RequestBody 类内部提供了多种静态方法，分别用于创建不同形式的请求体数据：
+okhttp3. RequestBody 类内部提供了多种静态方法，分别用于创建不同形式的请求体数据：
 
 ```java
 public static RequestBody create(final byte[] content);
@@ -190,13 +190,13 @@ public static RequestBody create(final ByteString content, final MediaType conte
 public static RequestBody create(final File file, final MediaType contentType);
 ```
 
-其中 okhttp3.MediaType 对象是用于设置请求体类型，比如我想要请求的是 JSON 格式请求体就可以使用如下形式：
+其中 okhttp3. MediaType 对象是用于设置请求体类型，比如我想要请求的是 JSON 格式请求体就可以使用如下形式：
 
 ```java
 MediaType type = MediaType.parse("application/json;charset=utf-8");
 ```
 
-之后设置到 okhttp3.Request 对象即可：
+之后设置到 okhttp3. Request 对象即可：
 
 ```java
 Request request = new Request.Builder()
@@ -206,9 +206,9 @@ Request request = new Request.Builder()
     .build();
 ```
 
-这些静态方法基本上满足我们日常使用了。不过，okhttp 还提供了两个 okhttp3.RequestBody 的扩展类，分别是用于文件上传的 `okhttp3.MultipartBody` 和 Form 表单数据 `okhttp3.FormBody`：
+这些静态方法基本上满足我们日常使用了。不过，okhttp 还提供了两个 okhttp3. RequestBody 的扩展类，分别是用于文件上传的 `okhttp3.MultipartBody` 和 Form 表单数据 `okhttp3.FormBody` ：
 
-![RequestBody.png](https://ituknown.org/java-media/okhttp/RequestBody.png)
+![RequestBody.png](https://media.ituknown.org/java-media/okhttp/RequestBody.png)
 
 ## JSON 请求
 
@@ -236,7 +236,7 @@ Call call = CLIENT.newCall(request);
 
 ## 表单请求
 
-Form 表单请求使用的 Media 类型是 `application/x-www-form-urlencoded`。okhttp 提供了一个对应的 Form 表单请求体类：`FormBody`。我们可以直接使用该对象构造 Form 表单数据即可：
+Form 表单请求使用的 Media 类型是 `application/x-www-form-urlencoded` 。okhttp 提供了一个对应的 Form 表单请求体类： `FormBody` 。我们可以直接使用该对象构造 Form 表单数据即可：
 
 ```java
 FormBody requestBody = new FormBody.Builder()
@@ -254,7 +254,7 @@ Request request = new Request.Builder()
 Call call = CLIENT.newCall(request);
 ```
 
-需要说明的是，`FormBody` 对象内部设置了一个默认 MediaType：
+需要说明的是， `FormBody` 对象内部设置了一个默认 MediaType：
 
 ```java
 private static final MediaType CONTENT_TYPE = MediaType.get("application/x-www-form-urlencoded");
@@ -264,7 +264,7 @@ private static final MediaType CONTENT_TYPE = MediaType.get("application/x-www-f
 
 ## 文件上传
 
-okhttp 同样提供了一个用于构造文件上传的请求体类：`MultipartBody`。我们可以直接借助该类构造文件上传对象，示例如下：
+okhttp 同样提供了一个用于构造文件上传的请求体类： `MultipartBody` 。我们可以直接借助该类构造文件上传对象，示例如下：
 
 ```java
 // 文件

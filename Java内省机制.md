@@ -21,14 +21,14 @@ public class User {
 }
 ```
 
-很简单的一个类，我们在初学 Java 时老师就对我们说：要将类中的成员变量设为私有（`private`），并创建两个可对外访问（`public`）的 `getter/setter` 方法。
+很简单的一个类，我们在初学 Java 时老师就对我们说：要将类中的成员变量设为私有（ `private` ），并创建两个可对外访问（ `public` ）的 `getter/setter` 方法。
 
 但是这两个方法为什么要以 `get` 和 `set` 方法作为前缀老师似乎没有说对吗？这其实就是 Java 内省机制（一种 Java 内置的开发规范）。
 
 在阿里巴巴出品的开发规范中对 Boolean 类型的属性有如下规范：
 
-- **【强制】POJO 类中布尔类型的变量，都不要加 is 前缀，否则部分框架解析会引起序列化错误。**
-- **【强制】velocity 调用 POJO 类的属性时，建议直接使用属性名取值即可，模板引擎会自动按 规范调用 POJO 的 getXxx()，如果是 boolean 基本数据类型变量(boolean 命名不需要加 is 前缀)，会自动调用 isXxx()方法。**
+* **【强制】POJO 类中布尔类型的变量，都不要加 is 前缀，否则部分框架解析会引起序列化错误。**
+* **【强制】velocity 调用 POJO 类的属性时，建议直接使用属性名取值即可，模板引擎会自动按 规范调用 POJO 的 getXxx()，如果是 boolean 基本数据类型变量(boolean 命名不需要加 is 前缀)，会自动调用 isXxx()方法。**
 
 如果大家看过阿里巴巴的开发规范的话一定会注意到这两条对 Boolean 属性的规范，可是为什么要这么规范呢？其实这也是 Java 内省机制的一部分。且听吾辈一一道来~
 
@@ -85,7 +85,7 @@ public class User {
 
 上面四个示例很简单，至于 Java 内省机制为什么没有 “自作聪明” 的认为 User 类中有 `username` 这个属性原因是上面四个示例 “都不符合我们最开始学习 Java 时的规范”。
 
-再比如下面的示例代码，Java 内省机制解析得到的 “属性” 为 `age` 和 `username`：
+再比如下面的示例代码，Java 内省机制解析得到的 “属性” 为 `age` 和 `username` ：
 
 ```java
 public class User {
@@ -100,7 +100,7 @@ public class User {
 }
 ```
 
-再比如下面的示例代码，对于 Java 内省机制而言，“真正的属性” 还是 `age`、`username`。
+再比如下面的示例代码，对于 Java 内省机制而言，“真正的属性” 还是 `age` 、 `username` 。
 
 ```java
 public class User {
@@ -119,9 +119,9 @@ public class User {
 
 之所以会得到这样的结果是对于 Java 内省机制而言，在解析类中的方法时会做如下判断：
 
-- 判断该方法是否为 `public` 类型
-- 如果无参：验证方法是否以 `is` 或 `get` 开头。如果是以 `is` 为前缀的方法会继续判断返回类型是否为 Boolean，如果符合这些条件那么就截取 `get` 或 `is` 后的字符作为所谓的 “属性”，并将方法设置为 “读” 方法。
-- 如果有参：验证方法是否有返回值，且方法只有一个参数且以 `set` 开始，就截取 `set` 后面的字符作为所谓的 “属性”，并将方法设置为 “写” 方法。
+* 判断该方法是否为 `public` 类型
+* 如果无参：验证方法是否以 `is` 或 `get` 开头。如果是以 `is` 为前缀的方法会继续判断返回类型是否为 Boolean，如果符合这些条件那么就截取 `get` 或 `is` 后的字符作为所谓的 “属性”，并将方法设置为 “读” 方法。
+* 如果有参：验证方法是否有返回值，且方法只有一个参数且以 `set` 开始，就截取 `set` 后面的字符作为所谓的 “属性”，并将方法设置为 “写” 方法。
 
 上面只是简单的说下大概的判断逻辑，具体还是要看下下面的源码部分才能明白到底是什么意思。
 
@@ -139,7 +139,7 @@ public class User {
 
 反射是在运行状态下把 Class 中的各种成分映射为相应的 Java 类，可以动态的获取所有的属性以及动态的调用任意一个方法，强调的时运行状态。
 
-而内省机制是基于反射来实现的，`BeanInfo` API 是用来暴露一个 JavaBean 的属性、方法和事件。得到这个 JavaBean 对象，我们就可以操作该 JavaBean 的属性。
+而内省机制是基于反射来实现的， `BeanInfo` API 是用来暴露一个 JavaBean 的属性、方法和事件。得到这个 JavaBean 对象，我们就可以操作该 JavaBean 的属性。
 
 # 内省 API
 
@@ -160,7 +160,7 @@ java.beans.EventSetDescriptor
 
 如下图：
 
-<img src="https://ituknown.org/java-media/Introspector/introspector_inheritance_relationship.png" alt="introspector_inheritance_relationship.png" style="max-width: 650px;">
+<img src="https://media.ituknown.org/java-media/Introspector/introspector_inheritance_relationship.png" alt="introspector_inheritance_relationship.png" style="max-width: 650px; ">
 
 类 `Introspector` 通常是操作内省  API 的入口类，该类只有一个 “私有” 的构造方法：
 
@@ -184,7 +184,7 @@ public static void flushCaches(){}
 public static void flushFromCaches(Class<?> clz){}
 ```
 
-而我们实际上关系的方法只有 `getBeanInfo()`，因为该方法可以得到一个 `BeanInfo` 类型的对象，先看下 BeanInfo 接口 “主要” 有哪些方法（只展示我们实际需要关心的方法）：
+而我们实际上关系的方法只有 `getBeanInfo()` ，因为该方法可以得到一个 `BeanInfo` 类型的对象，先看下 BeanInfo 接口 “主要” 有哪些方法（只展示我们实际需要关心的方法）：
 
 ```java
 public interface BeanInfo {
@@ -247,8 +247,6 @@ public class User {
     }
 }
 ```
-
-
 
 | 说明                                  |
 | :------------------------------------ |
@@ -317,8 +315,6 @@ private BeanInfo getBeanInfo() throws IntrospectionException {
 
 }
 ```
-
-
 
 | **说明**                                                     |
 | :----------------------------------------------------------- |
@@ -461,7 +457,7 @@ equals
 toString
 ```
 
-嗯..... 有点出乎意料，我们在 User 这个类中实际定义的了那些方法？为什么 `getClass` 、`wait` 方法都出来了？
+嗯..... 有点出乎意料，我们在 User 这个类中实际定义的了那些方法？为什么 `getClass` 、 `wait` 方法都出来了？
 
 实际上，该方法是 Object 中的方法。我们都知道 Object 是所有类的顶级父类，这个很好理解。至于为什么会得到父类的方法，还记得最开始说的 Java 内省的入口类 Introspector 只提供了一个私有的构造方法？看下该私有的构造方法干了什么事情：
 
@@ -551,7 +547,7 @@ public class MethodDescriptor {
 }
 ```
 
-其中，`getParameterDescriptors()` 方法指的就是该方法的参数信息。`getMethod()` 方法返回的是一个 `Method` 对象，这个是反射的知识了，这里不多说。最后一个 `getName()` 方法指的是方法名：
+其中， `getParameterDescriptors()` 方法指的就是该方法的参数信息。 `getMethod()` 方法返回的是一个 `Method` 对象，这个是反射的知识了，这里不多说。最后一个 `getName()` 方法指的是方法名：
 
 ```java
 for (MethodDescriptor methodDescriptor : methodDescriptors) {
@@ -584,9 +580,9 @@ public class PropertyDescriptor extends FeatureDescriptor {
 }
 ```
 
-在这个对象中是不是定义了几个方法？Read 和 Write，那这又是什么呢？想弄清楚这个问题我们还是要看下这个对象创建方法：`java.beans.Introspector#getTargetPropertyInfo`，我们在调用 API 时所谓的 `Read/Write` 方法都是在其内部处理的。
+在这个对象中是不是定义了几个方法？Read 和 Write，那这又是什么呢？想弄清楚这个问题我们还是要看下这个对象创建方法： `java.beans.Introspector#getTargetPropertyInfo` ，我们在调用 API 时所谓的 `Read/Write` 方法都是在其内部处理的。
 
-不过首先我们需要先说下在 `Introspector`  内部定义了几个常量：
+不过首先我们需要先说下在 `Introspector` 内部定义了几个常量：
 
 ```java
 public class Introspector {

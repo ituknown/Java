@@ -19,8 +19,7 @@ User user = objectMapper.readValue(jsonStr, User.class);
 System.out.println(user);
 ```
 
-
-上面的示例使用的是 Class 重载方法 `readValue(String content, Class<T> valueType)`。
+上面的示例使用的是 Class 重载方法 `readValue(String content, Class<T> valueType)` 。
 
 另外我们还可以使用 TypeReference 重载方法 `readValue(String content, TypeReference valueTypeRef)` 来实现相同的效果：
 
@@ -34,7 +33,7 @@ User user = objectMapper.readValue(jsonStr, new TypeReference<User>(){});
 System.out.println(user);
 ```
 
-不过实际使用时并不推荐使用 `TypeReference`，因为 Java 的泛型类型擦除机制使得在运行时无法获取具体的类型信息。
+不过实际使用时并不推荐使用 `TypeReference` ，因为 Java 的泛型类型擦除机制使得在运行时无法获取具体的类型信息。
 
 # 字符串转集合
 
@@ -219,6 +218,6 @@ Jackson在反序列化处理Java8日期存在一些问题：
 
 当你尝试转换成 User 对象时会提示如下错误：
 
-![deserializationJava8DateFail1708509575.png](https://ituknown.org/java-media/jackson/deserializationJava8DateFail1708509575.png)
+![deserializationJava8DateFail1708509575.png](https://media.ituknown.org/java-media/jackson/deserializationJava8DateFail1708509575.png)
 
 归根结底，这是 Jackson 对 Java8 日期格式化得问题，解决方式见 [Java8日期格式问题](../java8日期格式问题.md)。
